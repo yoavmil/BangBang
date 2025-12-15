@@ -52,6 +52,7 @@ In the next example there is a acceleration limited trajectory, which splits the
 
 I needed this data for using a motion controller **position-velocity-time** spline, which requires knowing the knots position, speed and delta time from the previous knot. The switching points are required for the motion controller to build the spline smoothly.
 
+The underlying math could be found [here](./Math.md).
 
 ## Classes and Functions
 
@@ -70,10 +71,18 @@ In this class, if and when the acceleration reaches the maximum acceleration, th
 
 This class returns a number of switching times in case the acceleration limit is reached and there are 2 switching times.
 
----
+### Solve For Min Time / Min Jerk
+
+A common use case for these two methods is multi-axis synchronization.
+
+First, each axis is solved independently using `solveForMinTime` to determine
+the shortest feasible duration under its jerk (and acceleration) constraints.
+The longest duration among all axes is then selected as the synchronized motion time.
+
+All other axes are then re-solved using `solveForMinJerk`, with the common duration
+fixed, allowing them to reach the target state with reduced jerk while remaining
+time-aligned.
 
 ## Examples and Unit Tests
 
 In `BangBangTest.cpp` you can find multiple usage examples and edge-case tests.
-
-
