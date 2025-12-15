@@ -10,18 +10,20 @@ double vf=0, af=0;
 double jerk_max = 30; // mm/sec^3
 
 BangBang bangBang;
-bangBang.solveForMinTime(v0,a0, vf,a0, jerk_max);
+bangBang.solveForMinTime(v0,a0, vf,af, jerk_max);
 double t0 = 0;
 double t1 = bangBang.switchTime();
 double tf = bangBang.endTime();
 // use for building a spline at the rest of your SW stack
 spline_knots = {
-    // position, velocity, delta time
-    {bangBang.evalute(t0,0), bangBang.evalute(t0,1), 0},
-    {bangBang.evalute(t1,0), bangBang.evalute(t1,1), t1},
-    {bangBang.evalute(t2,0), bangBang.evalute(t2,1), t2-t1},
+    // position,                velocity,               delta time
+    {bangBang.evaluate(t0,0),   bangBang.evaluate(t0,1), 0},
+    {bangBang.evaluate(t1,0),   bangBang.evaluate(t1,1), t1},
+    {bangBang.evaluate(tf,0),   bangBang.evaluate(tf,1), t2-t1},
 };
 ```
+
+> All solutions are analytic and do not rely on numerical integration or iterative solvers.
 
 ## Motivation
 
@@ -34,7 +36,7 @@ Given some velocity and acceleration boundary conditions, I needed to build the 
 
 In this image there are 2 sections:
 1. From the initial state where `v0=2` and `a0=10`, using positive jerk the acceleration increases until the switching time.
-2. The jerk becomes negative and the acceleration decreases until it reaches the final required value `vf=10` and `af=0`.
+2. The jerk becomes negative and the acceleration decreases until it reaches the final required value `af=10`, while the velocity reaches `vf=0`.
 
 > This kind of trajectory is considered `c2` continuous, which means the position, velocity and acceleration are continuous.
 
@@ -61,10 +63,10 @@ This class can return the value of the position, velocity, acceleration and jerk
 
 It could also return the switching time and end time.
 
-`class BangBangLimitedAccel` and has only one construction function
+`class BangBangLimitedAccel` has only one construction function
 - `solveForMinTime(v0, a0, vf, af, aMax, Jmax)`. 
 
-In this class, if and when the acceleration reaches the maximum acceleration, the jerk is set to zero and the acceleration value is kept.
+In this class, if and when the acceleration reaches the maximum acceleration, the jerk is set to zero during the flat acceleration segment and the acceleration value is kept.
 
 This class returns a number of switching times in case the acceleration limit is reached and there are 2 switching times.
 
@@ -72,6 +74,6 @@ This class returns a number of switching times in case the acceleration limit is
 
 ## Examples and Unit Tests
 
-at the `BangBangTest.cpp` you could find multiple usage examples.
+In `BangBangTest.cpp` you can find multiple usage examples and edge-case tests.
 
 
