@@ -514,7 +514,7 @@ public:
         if (t <= t2)
         {
             double dt = t - t1;
-            if (d == 3) return 0.0;
+            if (d == 3) return j1_; // which is 0
             if (d == 2) return a1;
             if (d == 1) return v1 + a1 * dt;
             return x1 + v1 * dt + 0.5 * a1 * dt * dt;
@@ -530,11 +530,11 @@ public:
         double t3 = T_ - t2;
         double dt3 = t - t2;
 
-        if (d == 3) return -jMax_;
-        if (d == 2) return a2 - jMax_ * dt3;
-        if (d == 1) return v2 + a2 * dt3 - 0.5 * jMax_ * dt3 * dt3;
+        if (d == 3) return j2_;
+        if (d == 2) return a2 + j2_ * dt3;
+        if (d == 1) return v2 + a2 * dt3 +0.5 * j2_ * dt3 * dt3;
 
-        return x2 + v2 * dt3 + 0.5 * a2 * dt3 * dt3 - (1.0 / 6.0) * jMax_ * dt3 * dt3 * dt3;
+        return x2 + v2 * dt3 + 0.5 * a2 * dt3 * dt3 + (1.0 / 6.0) * j2_ * dt3 * dt3 * dt3;
     }
 
 private:

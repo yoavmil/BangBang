@@ -119,8 +119,13 @@ TEST(BangBang, min_time)
         BangBang bb;
         bb.solveForMinTime(t.v0, t.a0, t.vf, t.af, t.J);
 
-        EXPECT_NEAR(bb.switchTime(), t.expected_switch_time, 1e-1) << i;
-        EXPECT_NEAR(bb.endTime(), t.expected_T, 1e-1) << i;
+        EXPECT_NEAR(bb.switchTime(), t.expected_switch_time, 1e-3) << i;
+        EXPECT_NEAR(bb.endTime(), t.expected_T, 1e-3) << i;
+        auto T = bb.endTime();
+        EXPECT_NEAR(bb.evaluate(0, 1), t.v0, 1e-3) << i;
+        EXPECT_NEAR(bb.evaluate(0, 2), t.a0, 1e-3) << i;
+        EXPECT_NEAR(bb.evaluate(T, 1), t.vf, 1e-3) << i;
+        EXPECT_NEAR(bb.evaluate(T, 2), t.af, 1e-3) << i;
     }
 }
 
@@ -357,6 +362,18 @@ TEST(BangBang, min_time_limited_accel)
             }
         }
         EXPECT_NEAR(bb.endTime(), t.expected_T, 1e-3) << i;
+
+        auto T = bb.endTime();
+        ASSERT_NEAR(bb.evaluate(0, 1), t.v0, 1e-3) << i;
+        ASSERT_NEAR(bb.evaluate(0, 2), t.a0, 1e-3) << i;
+        ASSERT_NEAR(bb.evaluate(T, 1), t.vf, 1e-3) << i;
+        ASSERT_NEAR(bb.evaluate(T, 2), t.af, 1e-3) << i;
+
+        if (bb.switchingTimes().size() == 2) {
+            auto t_between_switches = (bb.switchingTimes().front() + bb.switchingTimes().back()) / 2;
+            auto j_between_switches = bb.evaluate(t_between_switches, 3);
+            ASSERT_EQ(j_between_switches, 0) << i;
+        }
     }
 }
 
